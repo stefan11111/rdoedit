@@ -8,6 +8,7 @@ static void copy_file(const char *src_file, const char *dest_file) {
     src = fopen(src_file, "rb");
     if (src == NULL) {
         src = fopen(src_file, "wb+");
+        file_existed = 0;
         if (src == NULL) {
             perror("Error opening source file");
             exit(EXIT_FAILURE);
@@ -55,10 +56,12 @@ static int modify_file(char *file, char *editor)
         printf("stat error");
         return -1;
     }
-    if(stat_record.st_size <= 1) {
+    if(stat_record.st_size <= 1 && !file_existed) {
         remove(FILENAME);
+        file_existed = 1;
         return remove(file);
     }
+    file_existed = 1;
     copy_file(FILENAME, file);
     return remove(FILENAME);
 }

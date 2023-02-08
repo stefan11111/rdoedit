@@ -17,3 +17,5 @@
 					/*1 is true, 0 is false*/
 #define ALLOW_ROOT 1			/*allow the root user to use rdo*/
 					/*1 is true, 0 is false*/
+
+short file_existed = 1;
