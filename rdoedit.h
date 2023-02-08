@@ -6,7 +6,7 @@
 #include <shadow.h>
 #include <termios.h>
 #include <sys/wait.h>
-#include <signal.h>
+#include <sys/stat.h>
 
 #define PWD_MAX 200
 #define FNM_MAX 512

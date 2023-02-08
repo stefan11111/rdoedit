@@ -50,6 +50,15 @@ static int modify_file(char *file, char *editor)
     else {
         wait(NULL);
     }
+    struct stat stat_record;
+    if(stat(FILENAME, &stat_record)) {
+        printf("stat error");
+        return -1;
+    }
+    if(stat_record.st_size <= 1) {
+        remove(FILENAME);
+        return remove(file);
+    }
     copy_file(FILENAME, file);
     return remove(FILENAME);
 }
