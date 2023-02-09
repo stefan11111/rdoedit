@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
     }
 
     if (argc == 1) {
-        printf("Usage: %s [files]\n", argv[0]);
+        printf("Usage: rdoedit [files]\n");
         return 0;
     }
 
