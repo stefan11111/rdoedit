@@ -45,6 +45,8 @@ make uninstall
 ```
 
 For convenience, you can alias rdoedit to rdo -e, sudo -e or anything else in your .bashrc or just rename the binary.
+If you do rename the binary, using rdo -e will no longer work.
+This isn't a concern if you weren't using rdo anyway.
 By default it is installed in /usr/local/bin.
 
 ### Usage
