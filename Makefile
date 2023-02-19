@@ -15,7 +15,7 @@ debug: rdoedit.c rdoedit.h
 	${CC} ${CFLAGS_DEBUG} rdoedit.c -o rdoedit ${LIBS}
 
 noconfig: rdoedit.noconfig.c rdoedit.h
-	${CC} ${CFLAGS_RELEASE} rdoedit.noconfig.c -o rdoedit ${LIBS}
+	${CC} ${CFLAGS_RELEASE} rdoedit.noconfig.c -o rdoedit
 
 install: rdoedit
 	cp rdoedit ${DESTDIR}/usr/local/bin

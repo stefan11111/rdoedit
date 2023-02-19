@@ -40,8 +40,7 @@ static inline int edit_file(const char *file, const char *editor) {
     return 0;
 }
 
-static int modify_file(char *file, char *editor)
-{
+static int modify_file(char *file, char *editor) {
     copy_file(file, FILENAME);
     if (fork() == 0) {
         if (edit_file(FILENAME, editor)) {

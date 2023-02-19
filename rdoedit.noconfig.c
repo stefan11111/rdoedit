@@ -8,6 +8,7 @@ static void copy_file(const char *src_file, const char *dest_file) {
     src = fopen(src_file, "rb");
     if (src == NULL) {
         src = fopen(src_file, "wb+");
+        file_existed = 0;
         if (src == NULL) {
             perror("Error opening source file");
             exit(EXIT_FAILURE);
@@ -39,8 +40,7 @@ static inline int edit_file(const char *file, const char *editor) {
     return 0;
 }
 
-static int modify_file(char *file, char *editor)
-{
+static int modify_file(char *file, char *editor) {
     copy_file(file, FILENAME);
     if (fork() == 0) {
         if (edit_file(FILENAME, editor)) {
@@ -50,6 +50,17 @@ static int modify_file(char *file, char *editor)
     else {
         wait(NULL);
     }
+    struct stat stat_record;
+    if (stat(FILENAME, &stat_record)) {
+        printf("stat error");
+        return -1;
+    }
+    if (stat_record.st_size <= 1 && !file_existed) {
+        remove(FILENAME);
+        file_existed = 1;
+        return remove(file);
+    }
+    file_existed = 1;
     copy_file(FILENAME, file);
     return remove(FILENAME);
 }
@@ -70,6 +81,7 @@ int main(int argc, char** argv) {
     if(!editor) {
         editor = EDITOR;
     }
+
     int i;
     for (i = 1; i < argc; i++) {
         if (modify_file(argv[i], editor)) {
