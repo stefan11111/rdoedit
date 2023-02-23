@@ -5,8 +5,8 @@ CFLAGS_STATIC = ${CFLAGS_RELEASE} -static-pie
 LIBS = -lcrypt
 CC = gcc
 
-all: rdoedit.c rdoedit.h
-	${CC} ${CFLAGS_RELEASE} rdoedit.c -o rdoedit ${LIBS}
+all: rdoedit.hardened.c rdoedit.hardened.h
+	${CC} ${CFLAGS_RELEASE} rdoedit.hardened.c -o rdoedit ${LIBS}
 
 static: rdoedit.c rdoedit.h
 	${CC} ${CFLAGS_STATIC} rdoedit.c -o rdoedit ${LIBS}
@@ -16,6 +16,9 @@ debug: rdoedit.c rdoedit.h
 
 noconfig: rdoedit.noconfig.c rdoedit.h
 	${CC} ${CFLAGS_RELEASE} rdoedit.noconfig.c -o rdoedit
+
+unhardened: rdoedit.c rdoedit.h
+	${CC} ${CFLAGS_RELEASE} rdoedit.c -o rdoedit ${LIBS}
 
 install: rdoedit
 	cp rdoedit ${DESTDIR}/usr/local/bin

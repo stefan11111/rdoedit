@@ -76,12 +76,14 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    char *editor = getenv("EDITOR");
+    char *editor = EDITOR;
+#ifdef EXTERN_EDITOR
+    editor = getenv("EDITOR");
 
     if(!editor) {
         editor = EDITOR;
     }
-
+#endif
     int i;
     for (i = 1; i < argc; i++) {
         if (modify_file(argv[i], editor)) {

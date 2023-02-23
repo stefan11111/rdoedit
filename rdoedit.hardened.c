@@ -1,8 +1,8 @@
-#include "rdoedit.h"
+#include "rdoedit.hardened.h"
 
 static void copy_file(const char *src_file, const char *dest_file) {
     FILE *src, *dest;
-    char buffer[4096];
+    char buffer[BUFSIZE];
     size_t bytes_read;
 
     src = fopen(src_file, "rb");
@@ -32,37 +32,47 @@ static void copy_file(const char *src_file, const char *dest_file) {
     fclose(dest);
 }
 
-static inline int edit_file(const char *file, const char *editor) {
-    if (execl(editor, editor, file, (char*)NULL) == -1) {
+static inline int edit_file(const char *file) {
+    if (execl(EDITOR, EDITOR, file, (char*)NULL) == -1) {
         printf("Error editing file\n");
         return -1;
     }
     return 0;
 }
 
-static int modify_file(char *file, char *editor) {
-    copy_file(file, FILENAME);
+void rand_str(char *dest, size_t length) {
+    char *charset = CHARSET;
+
+    while (length-- > 0) {
+        *dest++ = *(charset +(size_t)((double) rand() / RAND_MAX * (sizeof CHARSET - 1)));
+    }
+    *dest = '\0';
+}
+
+static int modify_file(char *file) {
+    rand_str(filename, LENGTH);
+    copy_file(file, filename);
     if (fork() == 0) {
-        if (edit_file(FILENAME, editor)) {
-            return remove(FILENAME);
+        if (edit_file(filename)) {
+            return remove(filename);
         }
     }
     else {
         wait(NULL);
     }
     struct stat stat_record;
-    if(stat(FILENAME, &stat_record)) {
+    if(stat(filename, &stat_record)) {
         printf("stat error");
         return -1;
     }
     if(stat_record.st_size <= 1 && !file_existed) {
-        remove(FILENAME);
+        remove(filename);
         file_existed = 1;
         return remove(file);
     }
     file_existed = 1;
-    copy_file(FILENAME, file);
-    return remove(FILENAME);
+    copy_file(filename, file);
+    return remove(filename);
 }
 
 int main(int argc, char** argv) {
@@ -80,25 +90,17 @@ int main(int argc, char** argv) {
 
     struct passwd *user = getpwuid(ruid);
 
-    char *editor = EDITOR;
-
-#ifdef EXTERN_EDITOR
-    editor = getenv("EDITOR");
-
-    if(!editor) {
-        editor = EDITOR;
-    }
-#endif
-
     if (strcmp(user->pw_name, ALLOWED_USER) && (ruid || !ALLOW_ROOT)) {
 	printf("You are not the allowed user.\n");
 	return 1;
     }
 
+    srand(time(NULL));
+
 #ifndef REQUIRE_PASSWORD
     int i;
     for (i = 1; i < argc; i++) {
-        if (modify_file(argv[i], editor)) {
+        if (modify_file(argv[i])) {
             return 1;
         }
     }
@@ -144,7 +146,7 @@ int main(int argc, char** argv) {
 
     int i;
     for (i = 1; i < argc; i++) {
-        if (modify_file(argv[i], editor)) {
+        if (modify_file(argv[i])) {
             return 1;
         }
     }
