@@ -19,6 +19,10 @@ If you do add some features, make a pull request. I might merge it.
 
 This app is very minimal. The base app is under 200 lines of code. The noconfig option reduces that to under 100 lines of code.
 
+In light of (not so recent) events, I have decided to add a hardened verision of this app and set it as the default build target.
+It sacrifices performance slightly, but improves security.
+Some time ago, CVE-2023-22809 was found is sudoedit and promptly patched. By my testing, rdoedit was not vulterable to this exploit, but I have decided to take some precautions. I have added the hardened option, which is compiled by default. It does not check the $EDITOR envvar and instead only uses the EDITOR macro defined in rdo.hardened.h. It also pseudo-randomly generates temorary filenames instead of using the same name, which could be vulnerable.
+
 ### Installation
 
 You can clone and build rdoedit with the following set of commands (as root if necessary):
@@ -29,6 +33,16 @@ cd rdoedit
 make
 make install
 ```
+
+This is how you build the unhardened version of this app:
+
+```sh
+git clone https://github.com/stefan11111/rdoedit.git
+cd rdoedit
+make unhardened
+make install
+```
+
 If you just want to edit a file as root using your config files(allow all users to use rdo with no password) you can do the following (as root if necessary) :
  
 ```sh
