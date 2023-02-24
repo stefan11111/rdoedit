@@ -2,7 +2,7 @@
 
 static void copy_file(const char *src_file, const char *dest_file) {
     FILE *src, *dest;
-    char buffer[4096];
+    char buffer[BUFSIZE];
     size_t bytes_read;
 
     src = fopen(src_file, "rb");
@@ -40,29 +40,40 @@ static inline int edit_file(const char *file, const char *editor) {
     return 0;
 }
 
+void rand_str(char *dest, size_t length) {
+    char *charset = CHARSET;
+
+    while (length-- > 0) {
+        *dest++ = *(charset +(size_t)((double) rand() / RAND_MAX * (sizeof CHARSET - 1)));
+    }
+    *dest = '\0';
+}
+
 static int modify_file(char *file, char *editor) {
-    copy_file(file, FILENAME);
+    char filename[LENGTH + 1];
+    rand_str(filename, LENGTH);
+    copy_file(file, filename);
     if (fork() == 0) {
-        if (edit_file(FILENAME, editor)) {
-            return remove(FILENAME);
+        if (edit_file(filename, editor)) {
+            return remove(filename);
         }
     }
     else {
         wait(NULL);
     }
     struct stat stat_record;
-    if(stat(FILENAME, &stat_record)) {
+    if(stat(filename, &stat_record)) {
         printf("stat error");
         return -1;
     }
     if(stat_record.st_size <= 1 && !file_existed) {
-        remove(FILENAME);
+        remove(filename);
         file_existed = 1;
         return remove(file);
     }
     file_existed = 1;
-    copy_file(FILENAME, file);
-    return remove(FILENAME);
+    copy_file(filename, file);
+    return remove(filename);
 }
 
 int main(int argc, char** argv) {
@@ -79,32 +90,35 @@ int main(int argc, char** argv) {
     const uid_t ruid = getuid();
 
     struct passwd *user = getpwuid(ruid);
-
-    char *editor = EDITOR;
-
-#ifdef EXTERN_EDITOR
-    editor = getenv("EDITOR");
-
-    if(!editor) {
-        editor = EDITOR;
-    }
-#endif
-
-    if (strcmp(user->pw_name, ALLOWED_USER) && (ruid || !ALLOW_ROOT)) {
+#ifdef ALLOW_ROOT
+    if (strcmp(user->pw_name, ALLOWED_USER) && ruid) {
 	printf("You are not the allowed user.\n");
 	return 1;
     }
-
-#ifndef REQUIRE_PASSWORD
-    int i;
-    for (i = 1; i < argc; i++) {
-        if (modify_file(argv[i], editor)) {
-            return 1;
-        }
-    }
-    return 0;
 #endif
-
+#ifndef ALLOW_ROOT
+    if (strcmp(user->pw_name, ALLOWED_USER)) {
+        printf("You are not the allowed user.\n");
+        return 1;
+    }
+#endif
+    srand(time(NULL));
+    char *editor = NULL;
+#ifdef EXTERN_EDITOR
+    editor = getenv("EDITOR");
+#endif
+    if (!editor) {
+        editor = EDITOR;
+    }
+    if (!ruid) {
+        int i;
+        for (i = 1; i < argc; i++) {
+            if (modify_file(argv[i], editor)) {
+                return 1;
+            }
+        }
+    return 0;
+    }
 #ifdef REQUIRE_PASSWORD
     char pass[PWD_MAX + 1];
     struct termios term;
@@ -141,7 +155,7 @@ int main(int argc, char** argv) {
 	printf("Wrong password.\n");
 	return 1;
     }
-
+#endif
     int i;
     for (i = 1; i < argc; i++) {
         if (modify_file(argv[i], editor)) {
@@ -149,5 +163,4 @@ int main(int argc, char** argv) {
         }
     }
     return 0;
-#endif
 }
