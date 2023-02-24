@@ -3,7 +3,7 @@ Minimal alternative to sudoedit
 
 This project aims to be a minimal alternative to sudoedit.
 Sudoedit by itself is over 700 lines of code by itself, not including all the header files or the fact that it's part of sudo.
-There is no reason why such a simple app should be so bloated of come bundled with bloat like sudo.
+There is no reason why such a simple app should be so bloated or come bundled with bloat like sudo.
 This readme is likely more verbose that my implementation. 
 
 This app allows you to edit files as root while using your config files for your editor(.nanorc, .vimrc, etc).
@@ -17,11 +17,14 @@ rdoedit.h is well commented and the code base is very small, so the source code 
 If you want to allow multiple users or groups to use the app either add the feature yourself or use sudoedit.
 If you do add some features, make a pull request. I might merge it.
 
-This app is very minimal. The base app is under 200 lines of code. The noconfig option reduces that to under 100 lines of code.
+This app is very minimal. It is under 200 lines of code.
 
 In light of (not so recent) events, I have decided to harden this app by default.
 It sacrifices performance slightly, but improves security.
-Some time ago, CVE-2023-22809 was found is sudoedit and promptly patched. By my testing, rdoedit was not vulterable to this exploit, but I have decided to take some precautions. It by default does not check the $EDITOR envvar and instead only uses the EDITOR macro defined in rdoedit.h. It also pseudo-randomly generates temorary filenames instead of using the same name, which could be vulnerable.
+Some time ago, CVE-2023-22809 was found in sudoedit and promptly patched.
+By my testing, rdoedit was not vulnerable to this exploit, but I have decided to take some precautions.
+This app by default no longer checks the $EDITOR envvar and instead only uses the EDITOR macro defined in rdoedit.h.
+It also pseudo-randomly generates temorary filenames instead of using a macro-defined name, which could be vulnerable.
 
 ### Installation
 
