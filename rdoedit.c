@@ -42,6 +42,8 @@ static inline int edit_file(const char *file, const char *editor) {
 
 void rand_str(char *dest, size_t length) {
     char *charset = CHARSET;
+    strcpy(dest, TMPDIR);
+    dest += sizeof(TMPDIR) - 1;
 
     while (length-- > 0) {
         *dest++ = *(charset +(size_t)((double) rand() / RAND_MAX * (sizeof CHARSET - 1)));
@@ -50,7 +52,7 @@ void rand_str(char *dest, size_t length) {
 }
 
 static int modify_file(char *file, char *editor) {
-    char filename[LENGTH + 1];
+    char filename[sizeof(TMPDIR) + LENGTH + 1];
     rand_str(filename, LENGTH);
     copy_file(file, filename);
     if (fork() == 0) {

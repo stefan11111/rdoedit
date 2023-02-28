@@ -13,6 +13,7 @@
 #define FNM_MAX 512
 #define ALLOWED_USER "stefan"		/*the allowed user*/
 #define EDITOR "/bin/nano"		/*fallback editor*/
+#define TMPDIR "/tmp/"			/*directory to store temporary files*/
 /*#define EXTERN_EDITOR*/		/*uncomment to set editor using $EDITOR envvar*/
 #define LENGTH 16			/*temporary file length*/
 #define BUFSIZE 4096			/*file buffer size, default is 4k*/
