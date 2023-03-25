@@ -53,7 +53,11 @@ void rand_str(char *dest, size_t length) {
 
 static int modify_file(char *file, char *editor) {
     char filename[sizeof(TMPDIR) + LENGTH + 1];
-    rand_str(filename, LENGTH);
+    struct stat statbuf;
+    do {
+        rand_str(filename, LENGTH);
+    }
+    while(!stat(filename, &statbuf));
     copy_file(file, filename);
     if (fork() == 0) {
         if (edit_file(filename, editor)) {
