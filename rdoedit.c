@@ -67,12 +67,7 @@ static int modify_file(char *file, char *editor) {
     else {
         wait(NULL);
     }
-    struct stat stat_record;
-    if(stat(filename, &stat_record)) {
-        printf("stat error");
-        return -1;
-    }
-    if(stat_record.st_size <= 1 && !file_existed) {
+    if(statbuf.st_size <= 1 && !file_existed) {
         remove(filename);
         file_existed = 1;
         return remove(file);
