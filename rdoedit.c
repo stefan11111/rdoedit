@@ -40,7 +40,7 @@ static inline int edit_file(const char *file, const char *editor) {
     return 0;
 }
 
-void rand_str(char *dest, size_t length) {
+static void rand_str(char *dest, size_t length) {
     char *charset = CHARSET;
     strcpy(dest, TMPDIR);
     dest += sizeof(TMPDIR) - 1;
@@ -66,6 +66,10 @@ static int modify_file(char *file, char *editor) {
     }
     else {
         wait(NULL);
+    }
+    if(stat(filename, &statbuf)) {
+        printf("stat error");
+        return -1;
     }
     if(statbuf.st_size <= 1 && !file_existed) {
         remove(filename);
@@ -96,8 +100,7 @@ int main(int argc, char** argv) {
 	printf("You are not the allowed user.\n");
 	return 1;
     }
-#endif
-#ifndef ALLOW_ROOT
+#else
     if (strcmp(user->pw_name, ALLOWED_USER)) {
         printf("You are not the allowed user.\n");
         return 1;
