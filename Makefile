@@ -17,8 +17,7 @@ debug: rdoedit.c rdoedit.h
 install: rdoedit
 	cp rdoedit ${DESTDIR}/usr/local/bin
 	chown root:root ${DESTDIR}/usr/local/bin/rdoedit
-	chmod 755 ${DESTDIR}/usr/local/bin/rdoedit
-	chmod u+s ${DESTDIR}/usr/local/bin/rdoedit
+	chmod 4755 ${DESTDIR}/usr/local/bin/rdoedit
 
 uninstall:
 	rm ${DESTDIR}/usr/local/bin/rdoedit
