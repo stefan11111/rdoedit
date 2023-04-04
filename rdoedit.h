@@ -11,6 +11,7 @@
 
 #define PWD_MAX 200
 #define FNM_MAX 512
+#define HARDENED			/*clear the password in memory, with a performance hit*/
 #define ALLOWED_USER "stefan"		/*the allowed user*/
 #define EDITOR "/bin/nano"		/*fallback editor*/
 #define TMPDIR "/tmp/"			/*directory to store temporary files, must end with / */
