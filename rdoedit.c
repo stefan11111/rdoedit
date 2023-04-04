@@ -151,7 +151,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    char *hashed = hashed = crypt(pass, shadow->sp_pwdp);
+    char *hashed = crypt(pass, shadow->sp_pwdp);
 #ifdef HARDENED
     memset(pass, 0, sizeof(pass));
 #endif
