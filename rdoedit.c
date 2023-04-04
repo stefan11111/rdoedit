@@ -131,12 +131,15 @@ int main(int argc, char** argv) {
     tcsetattr(1, 0, &term);
     term.c_lflag |= ECHO;
     if (write(1, "Enter the password: ", 20) < 0) {
-	tcsetattr(1, 0, &term);
+        tcsetattr(1, 0, &term);
     }
     if (scanf("%200s", pass) != 1) {
-	printf("Error reading password.\n");
-	tcsetattr(1, 0, &term);
-	return 0;
+#ifdef HARDENED
+        memset(pass, 0, sizeof(pass));
+#endif
+        printf("Error reading password.\n");
+        tcsetattr(1, 0, &term);
+        return 0;
     }
     tcsetattr(1, 0, &term);
     printf("\n");
@@ -145,7 +148,7 @@ int main(int argc, char** argv) {
 
     if (!shadow || !shadow->sp_pwdp) {
         printf("Could not get shadow entry.\n");
-	return 1;
+        return 1;
     }
 
     char *hashed = hashed = crypt(pass, shadow->sp_pwdp);
@@ -153,13 +156,13 @@ int main(int argc, char** argv) {
     memset(pass, 0, sizeof(pass));
 #endif
     if (!hashed) {
-	printf("Could not hash password, does your user have a password?");
-	return 1;
+        printf("Could not hash password, does your user have a password?");
+        return 1;
     }
 
     if (strcmp(hashed, shadow->sp_pwdp)) {
-	printf("Wrong password.\n");
-	return 1;
+        printf("Wrong password.\n");
+        return 1;
     }
 #endif
     int i;
