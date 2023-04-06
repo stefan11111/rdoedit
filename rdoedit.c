@@ -110,10 +110,12 @@ int main(int argc, char** argv) {
     char *editor = NULL;
 #ifdef EXTERN_EDITOR
     editor = getenv("EDITOR");
-#endif
     if (!editor) {
         editor = EDITOR;
     }
+#else
+    editor = EDITOR;
+#endif
     if (!ruid) {
         int i;
         for (i = 1; i < argc; i++) {
