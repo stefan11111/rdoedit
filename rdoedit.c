@@ -133,7 +133,8 @@ int main(int argc, char** argv) {
     if (write(1, "Enter the password: ", 20) < 0) {
         tcsetattr(1, 0, &term);
     }
-    if (scanf("%200s", pass) != 1) {
+    int n = read(0, pass, PWD_MAX);
+    if (n <= 0) {
 #ifdef HARDENED
         memset(pass, 0, sizeof(pass));
 #endif
@@ -143,6 +144,7 @@ int main(int argc, char** argv) {
     }
     tcsetattr(1, 0, &term);
     printf("\n");
+    pass[n - 1] = '\0';
 
     struct spwd* shadow = getspnam(user->pw_name);
 
