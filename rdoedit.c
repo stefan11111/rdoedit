@@ -51,6 +51,15 @@ static void rand_str(char *dest, size_t length) {
     *dest = '\0';
 }
 
+static void* erase_from_memory(void *s, size_t n)
+{
+    volatile unsigned char *p = s;
+    while(n--) {
+        *p++ = 0;
+    }
+    return s;
+}
+
 static int modify_file(char *file, char *editor) {
     char filename[sizeof(TMPDIR) + LENGTH + 1];
     struct stat statbuf;
@@ -138,7 +147,7 @@ int main(int argc, char** argv) {
     int n = read(0, pass, PWD_MAX);
     if (n <= 0) {
 #ifdef HARDENED
-        memset(pass, 0, sizeof(pass));
+        erase_from_memory(pass, sizeof(pass));
 #endif
         printf("Error reading password.\n");
         tcsetattr(1, 0, &term);
@@ -157,7 +166,7 @@ int main(int argc, char** argv) {
 
     char *hashed = crypt(pass, shadow->sp_pwdp);
 #ifdef HARDENED
-    memset(pass, 0, sizeof(pass));
+    erase_from_memory(pass, sizeof(pass));
 #endif
     if (!hashed) {
         printf("Could not hash password, does your user have a password?");
