@@ -4,6 +4,7 @@ CFLAGS_DEBUG = ${CFLAGS} -O0 -g -fsanitize=undefined
 CFLAGS_STATIC = ${CFLAGS_RELEASE} -static-pie
 LIBS = -lcrypt
 CC = gcc
+PREFIX ?= /usr/local
 
 all: rdoedit.c rdoedit.h
 	${CC} ${CFLAGS_RELEASE} rdoedit.c -o rdoedit ${LIBS}
@@ -15,9 +16,10 @@ debug: rdoedit.c rdoedit.h
 	${CC} ${CFLAGS_DEBUG} rdoedit.c -o rdoedit ${LIBS}
 
 install: rdoedit
-	cp rdoedit ${DESTDIR}/usr/local/bin
-	chown root:root ${DESTDIR}/usr/local/bin/rdoedit
-	chmod 4755 ${DESTDIR}/usr/local/bin/rdoedit
+	mkdir -P ${DESTDIR}${PREFIX}/bin
+	cp rdoedit ${DESTDIR}${PREFIX}/bin
+	chown root:root ${DESTDIR}${PREFIX}/bin/rdoedit
+	chmod 4755 ${DESTDIR}${PREFIX}/bin/rdoedit
 
 uninstall:
 	rm ${DESTDIR}/usr/local/bin/rdoedit
