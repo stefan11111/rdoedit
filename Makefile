@@ -16,7 +16,7 @@ debug: rdoedit.c rdoedit.h
 	${CC} ${CFLAGS_DEBUG} rdoedit.c -o rdoedit ${LIBS}
 
 install: rdoedit
-	mkdir -P ${DESTDIR}${PREFIX}/bin
+	mkdir -p ${DESTDIR}${PREFIX}/bin
 	cp rdoedit ${DESTDIR}${PREFIX}/bin
 	chown root:root ${DESTDIR}${PREFIX}/bin/rdoedit
 	chmod 4755 ${DESTDIR}${PREFIX}/bin/rdoedit
