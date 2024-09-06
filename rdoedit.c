@@ -34,7 +34,7 @@ static void copy_file(const char *src_file, const char *dest_file) {
 
 static inline int edit_file(const char *file, const char *editor) {
     if (execl(editor, editor, file, (char*)NULL) == -1) {
-        printf("Error editing file\n");
+        fprintf(stderr, "Error editing file\n");
         return -1;
     }
     return 0;
@@ -50,7 +50,8 @@ static void rand_str(char *dest, size_t length) {
     }
     *dest = '\0';
 }
-
+#ifdef REQUIRE_PASSWORD
+#ifdef HARDENED
 static void* erase_from_memory(void *s, size_t n)
 {
     volatile unsigned char *p = s;
@@ -59,7 +60,8 @@ static void* erase_from_memory(void *s, size_t n)
     }
     return s;
 }
-
+#endif
+#endif
 static int modify_file(char *file, char *editor) {
     char filename[sizeof(TMPDIR) + LENGTH + 1];
     struct stat statbuf;
@@ -77,7 +79,7 @@ static int modify_file(char *file, char *editor) {
         wait(NULL);
     }
     if(stat(filename, &statbuf)) {
-        printf("stat error");
+        fprintf(stderr, "stat error");
         return -1;
     }
     if(statbuf.st_size <= 1 && !file_existed) {
@@ -92,7 +94,7 @@ static int modify_file(char *file, char *editor) {
 
 int main(int argc, char** argv) {
     if (geteuid() != 0) {
-        printf("The rdoedit binary needs to be installed as SUID.\n");
+        fprintf(stderr, "The rdoedit binary needs to be installed as SUID.\n");
         return 1;
     }
 
@@ -105,13 +107,13 @@ int main(int argc, char** argv) {
 
     struct passwd *user = getpwuid(ruid);
 #ifdef ALLOW_ROOT
-    if (strcmp(user->pw_name, ALLOWED_USER) && ruid) {
-	printf("You are not the allowed user.\n");
+    if (ruid && strcmp(user->pw_name, ALLOWED_USER)) {
+	fprintf(stderr, "You are not the allowed user.\n");
 	return 1;
     }
 #else
     if (strcmp(user->pw_name, ALLOWED_USER)) {
-        printf("You are not the allowed user.\n");
+        fprintf(stderr, "You are not the allowed user.\n");
         return 1;
     }
 #endif
@@ -149,7 +151,7 @@ int main(int argc, char** argv) {
 #ifdef HARDENED
         erase_from_memory(pass, sizeof(pass));
 #endif
-        printf("Error reading password.\n");
+        fprintf(stderr, "Error reading password.\n");
         tcsetattr(1, 0, &term);
         return 0;
     }
@@ -160,7 +162,7 @@ int main(int argc, char** argv) {
     struct spwd* shadow = getspnam(user->pw_name);
 
     if (!shadow || !shadow->sp_pwdp) {
-        printf("Could not get shadow entry.\n");
+        fprintf(stderr, "Could not get shadow entry.\n");
         return 1;
     }
 
@@ -169,12 +171,12 @@ int main(int argc, char** argv) {
     erase_from_memory(pass, sizeof(pass));
 #endif
     if (!hashed) {
-        printf("Could not hash password, does your user have a password?");
+        fprintf(stderr, "Could not hash password, does your user have a password?");
         return 1;
     }
 
     if (strcmp(hashed, shadow->sp_pwdp)) {
-        printf("Wrong password.\n");
+        fprintf(stderr, "Wrong password.\n");
         return 1;
     }
 #endif
